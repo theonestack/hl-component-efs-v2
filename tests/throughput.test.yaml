@@ -1,0 +1,8 @@
+test_metadata:
+  type: config
+  name: throughput
+  description: test provisioned throughput config
+
+performance_mode: maxIO # generalPurpose | maxIO
+throughput_mode: provisioned # bursting | provisioned
+provisioned_throughput: 10.1

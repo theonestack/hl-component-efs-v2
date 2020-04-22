@@ -1,0 +1,11 @@
+test_metadata:
+  type: config
+  name: lifecycles
+  description: test the lifecycles config
+
+encrypt: true
+kms_key_alias: true
+
+
+lifecycle_policies:
+  - AFTER_14_DAYS

@@ -1,0 +1,20 @@
+test_metadata:
+  type: config
+  name: securitygroup
+  description: test the security group config
+
+
+ip_blocks:
+  local:
+    - 127.0.0.1/32
+    - 127.0.0.2/32
+  public:
+    - 0.0.0.0/0
+
+security_group_rules:
+  -
+    from: 2049
+    ip_blocks:
+      - local
+    desc: Use IP blocks and SG group
+    security_group_id: sg-rkqufht

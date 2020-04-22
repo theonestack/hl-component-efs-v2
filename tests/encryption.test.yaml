@@ -1,0 +1,7 @@
+test_metadata:
+  type: config
+  name: encryption
+  description: test the encryption config
+
+encrypt: true
+kms_key_alias: true
