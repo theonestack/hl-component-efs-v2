@@ -8,7 +8,7 @@ CloudFormation do
   )
 
   extra_tags = external_parameters.fetch(:extra_tags, {})
-  extra_tags.each { |key,value| tags << { Key: key, Value: value } }
+  tags.push(*extra_tags.map {|k,v| {Key: k, Value: FnSub(v)}}).uniq! { |h| h[:Key] }
 
   ip_blocks = external_parameters.fetch(:ip_blocks, {})
   security_group_rules = external_parameters.fetch(:security_group_rules, [])
@@ -29,17 +29,16 @@ CloudFormation do
   {kms: kms, encrypt: encrypt}.each { |key, value| raise ArgumentError, "#{key} config value must be a boolean" unless [true, false].include?(value) }
 
   lifecycle_policies = external_parameters.fetch(:lifecycle_policies, [])
-  lifecycle_policies.each { |rule| lifecycles.push({TransitionToIA: rule})}
-
-  if lifecycles.any?
-    allowed = %w(
-      AFTER_14_DAYS
-      AFTER_30_DAYS
-      AFTER_60_DAYS
-      AFTER_7_DAYS
-      AFTER_90_DAYS
-    )
-    lifecycles.each {|cycle| raise ArgumentError, "Lifecycle value: #{cycle[:TransitionToIA]} must match one of #{allowed}" unless allowed.include?(cycle[:TransitionToIA]) }
+  allowed = %w(
+    AFTER_14_DAYS
+    AFTER_30_DAYS
+    AFTER_60_DAYS
+    AFTER_7_DAYS
+    AFTER_90_DAYS
+  )
+  lifecycle_policies.each do |rule|
+    raise ArgumentError, "Lifecycle rule #{rule} must match one of #{allowed}" unless allowed.include?(rule)
+    lifecycles.push({TransitionToIA: rule})
   end
 
   performance_mode = external_parameters.fetch(:performance_mode, nil)
