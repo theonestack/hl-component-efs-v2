@@ -8,7 +8,10 @@ CfhighlanderTemplate do
     ComponentParam 'EnvironmentType', 'development', isGlobal: true
     ComponentParam 'VPCId', type: 'AWS::EC2::VPC::Id'
     ComponentParam 'SubnetIds', type: 'List<AWS::EC2::Subnet::Id>'
-    ComponentParam 'AvailabilityZones', isGlobal: true
+    ComponentParam 'AvailabilityZones', max_availability_zones,
+      allowedValues: (1..max_availability_zones).to_a,
+      description: 'Set the Availability Zone count for the stack',
+      isGlobal: true
 
     # Optional based on config file
     ComponentParam 'KmsKeyId' if defined? kms
