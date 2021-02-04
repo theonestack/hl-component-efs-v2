@@ -1,0 +1,24 @@
+test_metadata:
+  type: config
+  name: access_points
+  description: Adding access points config
+
+access_points:
+  -
+    name: images
+    filesystem_id: fs-1234
+    root_directory:
+      CreationInfo:
+        OwnerGid: '33'
+        OwnerUid: '33'
+        Permissions: '774'
+      Path: /efs/imgs
+  -
+    name: docs
+    filesystem_id: fs-1234
+    root_directory:
+      CreationInfo:
+        OwnerGid: '33'
+        OwnerUid: '33'
+        Permissions: '774'
+      Path: /efs/docs
