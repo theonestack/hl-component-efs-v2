@@ -69,7 +69,7 @@ CloudFormation do
       EFS_AccessPoint("#{ap['name']}AccessPoint") do
         ClientToken ap['client_token'] if ap.has_key?('client_token')
         AccessPointTags ap['tags'] if ap.has_key?('tags')
-        FileSystemId FnSub(ap['filesystem_id']) if ap.has_key?('filesystem_id')
+        FileSystemId Ref('FileSystem')
         PosixUser ap['posix_user'] if ap.has_key?('posix_user')
         RootDirectory ap['root_directory'] if ap.has_key?('root_directory')
       end
