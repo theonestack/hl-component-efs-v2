@@ -1,24 +1,73 @@
 # efs-v2 CfHighlander component
-
-Component to provision Elastic File System
-
-```bash
-kurgan add efs-v2
-```
-
-
-## Requirements
-
 ## Parameters
 
 | Name | Use | Default | Global | Type | Allowed Values |
 | ---- | --- | ------- | ------ | ---- | -------------- |
 | EnvironmentName | Tagging | dev | true | string
 | EnvironmentType | Tagging | development | true | string | ['development','production']
-| VPCId | VPC to launch in |None | false | AWS::EC2::VPC::Id
-| SubnetIds | Subnet list to launch in |None | false | List<\/AWS::EC2::Subnet::Id>
-| AvailabilityZones | Runtime param to set the az count for the stack |max_availability_zones | true | String
-| KmsKeyId | KmsKeyArn if using CMK |None | false | String
+| VPCId | VPC ID to connect to | None | false | AWS::EC2::VPC::Id
+| SubnetIds | SubnetIDs to provision ENIs to | None | false | string
+| AvailabilityZones | Number of AZs to be available in | None | true | string
+| KmsKeyId | KMS key ID to use to encrypt data | None | false | string
+
+## Outputs/Exports
+
+| Name | Value | Exported |
+| ---- | ----- | -------- |
+| FileSystem | file system ID | true
+| EFSSecurityGroup | EFS Security group ID | true
+| {ap_name}AccessPoint | AccessPoint name
+
+## Included Components
+[lib-ec2](https://github.com/theonestack/hl-component-lib-ec2)
+
+## Example Configuration
+### Highlander
+```
+  Component name: 'efsv2', template: 'efs-v2' do
+    parameter name: 'VPCId', value: cfout('vpcv2', 'VPCId')
+    parameter name: 'SubnetIds', value: cfout('vpcv2', 'PersistenceSubnets')
+    parameter name: 'AvailabilityZones', value: '2'
+    parameter name: 'VPCCidr', value: cfout('vpcv2', 'VPCCidr')
+  end
+```
+### EFS Configuration
+```
+encrypt: true
+
+access_points:
+  -
+    name: AppData
+    root_directory:
+      CreationInfo:
+        OwnerGid: '33'
+        OwnerUid: '33'
+        Permissions: '774'
+      Path: /app_data
+  -
+    name: AppLogs
+    root_directory:
+      CreationInfo:
+        OwnerGid: '33'
+        OwnerUid: '33'
+        Permissions: '774'
+      Path: /app_logs
+
+
+security_group_rules:
+  -
+    protocol: tcp
+    from: 2049
+    to: 2049
+    ip: ${VPCCidr}
+  -
+    protocol: tcp
+    from: 2049
+    to: 2049
+    ip_blocks:
+      - company_office
+      - company_client_vpn
+```
 
 ## Configuration
 
@@ -105,9 +154,23 @@ Optionally set provisioned throughput in mibps, cloudformation expects a double
 provisioned_throughput: 10.1
 ```
 
+## Cfhighlander Setup
 
-## Outputs
-| Name | Value| Example
-| ---- | --- |-------|
-| FileSystem | file system ID | fs-12345678
-| EFSSecurityGroup | EFS Security group ID | sg-ghrnsla
+install cfhighlander [gem](https://github.com/theonestack/cfhighlander)
+
+```bash
+gem install cfhighlander
+```
+
+or via docker
+
+```bash
+docker pull theonestack/cfhighlander
+```
+## Testing Components
+
+Running the tests
+
+```bash
+cfhighlander cftest efs-v2
+```
