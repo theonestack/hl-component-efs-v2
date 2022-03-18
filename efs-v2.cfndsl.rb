@@ -111,6 +111,9 @@ CloudFormation do
     Value(Ref('FileSystem'))
     Export FnSub("${EnvironmentName}-#{external_parameters[:component_name]}-FileSystem")
   }
-  Output('EFSSecurityGroup', Ref('SecurityGroupEFS'))
+  Output('EFSSecurityGroup') {
+    Value(Ref('SecurityGroupEFS'))
+    Export FnSub("${EnvironmentName}-#{external_parameters[:component_name]}-SecurityGroup")
+  }
 
 end
