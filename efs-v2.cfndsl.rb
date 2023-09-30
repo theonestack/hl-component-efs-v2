@@ -51,7 +51,7 @@ CloudFormation do
   provisioned_throughput = external_parameters.fetch(:provisioned_throughput, nil)
   if !throughput_mode.nil?
     # Ensure value provided in config matches allowed values expected by cloudformation
-    raise ArgumentError, "throughput_mode value can only be set to bursting or provisioned" unless %w(bursting provisioned).include? throughput_mode
+    raise ArgumentError, "throughput_mode value can only be set to bursting or provisioned or elastic" unless %w(bursting provisioned elastic).include? throughput_mode
     if (throughput_mode == 'provisioned' && provisioned_throughput.nil?)
       raise ArgumentError, "When setting throughput_mode to provisioned, provisioned_throughput value must be defined"
     end
@@ -66,6 +66,15 @@ CloudFormation do
 
   unless access_points.empty?
     access_points.each do |ap|
+      
+      if ap.has_key?('name')
+        if ap.has_key?('tags')
+          ap['tags'] << { "Key"=>"Name", "Value"=>ap['name']}  
+        else
+          ap.merge!( { "tags" => [{ "Key"=>"Name", "Value"=>ap['name']}]} )
+        end
+      end
+      
       EFS_AccessPoint("#{ap['name']}AccessPoint") do
         ClientToken ap['client_token'] if ap.has_key?('client_token')
         AccessPointTags ap['tags'] if ap.has_key?('tags')
