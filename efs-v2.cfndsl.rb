@@ -75,7 +75,7 @@ CloudFormation do
         end
       end
       
-      EFS_AccessPoint("#{ap['name']}AccessPoint") do
+      EFS_AccessPoint("#{ap['name'].gsub('-','_').gsub('_','')}AccessPoint") do
         ClientToken ap['client_token'] if ap.has_key?('client_token')
         AccessPointTags ap['tags'] if ap.has_key?('tags')
         FileSystemId Ref('FileSystem')
@@ -83,9 +83,9 @@ CloudFormation do
         RootDirectory ap['root_directory'] if ap.has_key?('root_directory')
       end
 
-      Output("#{ap['name']}AccessPoint") {
-        Value(Ref("#{ap['name']}AccessPoint"))
-        Export FnSub("${EnvironmentName}-#{external_parameters[:component_name]}-#{ap['name']}AccessPoint")
+      Output("#{ap['name'].gsub('-','_').gsub('_','')}AccessPoint") {
+        Value(Ref("#{ap['name'].gsub('-','_').gsub('_','')}AccessPoint"))
+        Export FnSub("${EnvironmentName}-#{external_parameters[:component_name]}-#{ap['name'].gsub('-','_').gsub('_','')}AccessPoint")
       }
     end
   end
